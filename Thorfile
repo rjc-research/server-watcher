@@ -105,18 +105,11 @@ class Sw < Thor
     # check if server is alive
     SwLog.info(":::CHECK SERVER '#{name}'")
     if url.start_with?('http')
-      code = check_http(url)
-      is_on = code == '200'
-      if !is_on
-        err_msg = "HTTP #{code}"
-      end
+      is_on, err_msg = check_http(url)
     elsif url.start_with?('ws')
-      is_on = check_ws(url)
-      if !is_on
-        err_msg = "Failed to connect Websocket"
-      end
+      is_on, err_msg = check_ws(url)
     else
-      raise 'Protocol of url must be \'http\' or \'ws\''
+      raise 'Protocol of url must be \'http/https\' or \'ws/wss\''
     end
 
     # if server is on, do nothing
@@ -178,20 +171,25 @@ class Sw < Thor
   end
 
   def check_http(url)
+    begin
     SwLog.info(" - GET #{url}")
     uri = URI.parse(URI.encode(url))
     http = Net::HTTP.new(uri.host, uri.port)
     response = http.get(uri.request_uri)
-    response.code
+      is_success = response.code == '200'
+      return [is_success, !is_success ? "HTTP #{response.code}" : '']
+    rescue Exception => e
+      return [false, e.message]
+    end
   end
 
   def check_ws(url)
     begin
       SwLog.info(" - Connect Websocket: #{url}")
-      result = system("node websocket/check.js #{url}")
-      return result
-    rescue
-      return false
+      is_success = system("node websocket/check.js #{url}")
+      return [is_success, !is_success ? 'Failed to connect Websocket' : '']
+    rescue Exception => e
+      return [false, e.message]
     end
   end
 
