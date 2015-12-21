@@ -105,18 +105,11 @@ class Sw < Thor
     # check if server is alive
     SwLog.info(":::CHECK SERVER '#{name}'")
     if url.start_with?('http')
-      code = check_http(url)
-      is_on = code == '200'
-      if !is_on
-        err_msg = "HTTP #{code}"
-      end
+      is_on, err_msg = check_http(url)
     elsif url.start_with?('ws')
-      is_on = check_ws(url)
-      if !is_on
-        err_msg = "Failed to connect Websocket"
-      end
+      is_on, err_msg = check_ws(url)
     else
-      raise 'Protocol of url must be \'http\' or \'ws\''
+      raise 'Protocol of url must be \'http/https\' or \'ws/wss\''
     end
 
     # if server is on, do nothing
@@ -138,11 +131,14 @@ class Sw < Thor
       end
       time_string = filenamize(now.to_s)
       log[:path].each do |lp|
-        tailed_file = "#{File.dirname(lp)}/[#{filenamize(name)}]_[#{time_string}]_#{File.basename(lp)}"
+        tailed_file = "~/[#{filenamize(name)}]_[#{time_string}]_#{File.basename(lp)}"
         execute_remote(ssh, "tail -#{log[:lines]} #{lp} > #{tailed_file}")
         system "#{ssh[:use_sudo] ? 'sudo ' : ''}scp -i #{ssh[:pem]} #{ssh[:user]}@#{ssh[:server]}:#{tailed_file} #{root}/servers/logs/"
         execute_remote(ssh, "rm #{tailed_file}")
-        log_files << "#{root}/servers/logs/#{File.basename(tailed_file)}"
+        local_log_file = "#{root}/servers/logs/#{File.basename(tailed_file)}"
+        if File.exists?(local_log_file)
+          log_files << local_log_file
+        end
       end
       SwLog.info('   DONE')
     end
@@ -154,7 +150,7 @@ class Sw < Thor
         "Name: #{name}",
         "Url: #{url}",
         "Error: #{err_msg}",
-        "At: #{Time.now.to_s}",
+        "At: #{now.to_s}",
         "Logs:\n  #{log_files.join("\n  ")}"
       ].join("\n")
       send_mail(
@@ -178,20 +174,25 @@ class Sw < Thor
   end
 
   def check_http(url)
-    SwLog.info(" - GET #{url}")
-    uri = URI.parse(URI.encode(url))
-    http = Net::HTTP.new(uri.host, uri.port)
-    response = http.get(uri.request_uri)
-    response.code
+    begin
+      SwLog.info(" - GET #{url}")
+      uri = URI.parse(URI.encode(url))
+      http = Net::HTTP.new(uri.host, uri.port)
+      response = http.get(uri.request_uri)
+      is_success = response.code == '200'
+      return [is_success, !is_success ? "HTTP #{response.code}" : '']
+    rescue Exception => e
+      return [false, e.message]
+    end
   end
 
   def check_ws(url)
     begin
       SwLog.info(" - Connect Websocket: #{url}")
-      result = system("node websocket/check.js #{url}")
-      return result
-    rescue
-      return false
+      is_success = system("node websocket/check.js #{url}")
+      return [is_success, !is_success ? 'Failed to connect Websocket' : '']
+    rescue Exception => e
+      return [false, e.message]
     end
   end
 
