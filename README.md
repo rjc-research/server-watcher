@@ -40,6 +40,9 @@ thor sw:start
 
 # put it to crontab
 whenever --update-crontab
+
+# remove it from crontab
+whenever -c
 ```
 
 # Configuration example
