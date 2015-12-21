@@ -194,6 +194,11 @@ class Sw < Thor
   end
 
   def send_mail(_to, _subject, _body, _logs)
+    Mail.defaults do
+      delivery_method :sendmail, {
+        openssl_verify_mode: OpenSSL::SSL::VERIFY_NONE
+      }
+    end
     Mail.deliver do
       from('noreply@server-watch.com')
       to(_to)
