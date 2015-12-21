@@ -12,7 +12,8 @@ class Sw < Thor
 
   desc 'new', 'Add new server config in ./servers/configs'
   def new(name)
-    File.open("#{root}/servers/configs/#{filenamize(name)}.rb", 'w') do |f|
+    path = "#{root}/servers/configs/#{filenamize(name)}.rb"
+    File.open(path, 'w') do |f|
       f.write([
         "{",
         "  name: '#{name}',",
@@ -33,6 +34,7 @@ class Sw < Thor
         "}"
       ].join("\n"))
     end
+    puts("New configuration file is created at: #{path}".colorize(:green))
   end
 
   desc 'start', 'Run Server-Watcher server'
