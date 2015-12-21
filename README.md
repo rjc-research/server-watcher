@@ -14,6 +14,7 @@ Server Watcher is a lighweight tool that watches for your server shutdown.
 - Gem bundler
 - Postfix
 - Node & npm (for Websocket check)
+- Crontab
 
 # How to use
 ```sh
@@ -28,6 +29,7 @@ npm install
 cd ..
 
 # create boilerplate for new server configuration
+# this will create new file: ./servers/configs/your_server_name.rb 
 thor sw:new your_server_name
 
 # configure your server
