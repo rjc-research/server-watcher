@@ -33,3 +33,11 @@ build/
 
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
+
+# ignore log
+log/*.log
+
+# ignore server config & log files
+servers/configs/*.rb
+servers/configs/*.pem
+servers/logs/*.log
