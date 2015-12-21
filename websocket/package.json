@@ -1,0 +1,6 @@
+{
+  "name": "server-watcher",
+  "dependencies": {
+    "ws": "^0.8.1"
+  }
+}

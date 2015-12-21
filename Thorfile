@@ -2,10 +2,9 @@ require 'logger'
 require 'uri'
 require 'net/http'
 require 'open-uri'
-require 'websocket-client-simple'
 require 'json'
 require 'mail'
-require 'securerandom'
+require 'colorize'
 
 require 'byebug'
 
@@ -21,15 +20,16 @@ class Sw < Thor
         "  interval: 1,",
         "  alert: ['email@example.com', 'other@example.com'],",
         "  ssh: {",
-        "    pem: './mysite.pem',",
+        "    pem: '/path/to/your/mysite.pem',",
         "    user: 'ubuntu',",
-        "    server: 'mysite.com' || '50.60.70.80'",
+        "    server: 'mysite.com' || '50.60.70.80',",
+        "    use_sudo: true",
         "  },",
         "  log: {",
         "    path: ['/home/ubuntu/mysite/log/production.log', '/home/ubuntu/mysite/log/other.log'],",
         "    lines: 2000",
         "  },",
-        "  start_script: './chat_ws_start.sh'",
+        "  start_script: 'your script to start server comes here'",
         "}"
       ].join("\n"))
     end
@@ -43,6 +43,7 @@ class Sw < Thor
     SwLog.info(':::LOAD SERVER CONFIGS')
     Dir["#{root}/servers/configs/*.rb"].each do |file|
       begin
+        SwLog.info(" - #{file}")
         configs << eval(File.read(file))
       rescue Exception => e
         SwLog.error("Failed to load server config file: #{file}")
@@ -67,7 +68,7 @@ class Sw < Thor
   private 
 
   def filenamize(name)
-    name.gsub(/[^a-zA-Z0-9_\-\.]+/, '_')
+    name.gsub(/[^a-zA-Z0-9_\-\.\[\]\{\}\+]+/, '_')
   end
 
   def root
@@ -82,7 +83,7 @@ class Sw < Thor
       end
     end
     name          = config[:name]
-    url           = config[:url]
+    url           = config[:url].gsub(/^https:\/\//, 'http://').gsub(/^wss:\/\//, 'ws://')
     interval      = config[:interval]
     alert         = config[:alert]
     ssh           = config[:ssh]
@@ -99,7 +100,7 @@ class Sw < Thor
       return
     end
 
-    # ping server
+    # check if server is alive
     SwLog.info(":::CHECK SERVER '#{name}'")
     if url.start_with?('http')
       code = check_http(url)
@@ -135,10 +136,9 @@ class Sw < Thor
       end
       time_string = filenamize(now.to_s)
       log[:path].each do |lp|
-        ext = File.extname(lp)
-        tailed_file = "#{File.dirname(lp)}/#{filenamize(name)}_#{File.basename(lp, ext)}_#{time_string}#{ext}"
+        tailed_file = "#{File.dirname(lp)}/[#{filenamize(name)}]_[#{time_string}]_#{File.basename(lp)}"
         execute_remote(ssh, "tail -#{log[:lines]} #{lp} > #{tailed_file}")
-        system "scp -i #{ssh[:pem]} #{ssh[:user]}@#{ssh[:server]}:#{tailed_file} #{root}/servers/logs/"
+        system "#{ssh[:use_sudo] ? 'sudo ' : ''}scp -i #{ssh[:pem]} #{ssh[:user]}@#{ssh[:server]}:#{tailed_file} #{root}/servers/logs/"
         execute_remote(ssh, "rm #{tailed_file}")
         log_files << "#{root}/servers/logs/#{File.basename(tailed_file)}"
       end
@@ -153,7 +153,7 @@ class Sw < Thor
         "Url: #{url}",
         "Error: #{err_msg}",
         "At: #{Time.now.to_s}",
-        "Logs: #{log_files.join(', ')}"
+        "Logs:\n  #{log_files.join("\n  ")}"
       ].join("\n")
       send_mail(
         alert,
@@ -179,8 +179,6 @@ class Sw < Thor
     SwLog.info(" - GET #{url}")
     uri = URI.parse(URI.encode(url))
     http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = url.start_with?('https')
-    http.verify_mode = 0
     response = http.get(uri.request_uri)
     response.code
   end
@@ -188,9 +186,8 @@ class Sw < Thor
   def check_ws(url)
     begin
       SwLog.info(" - Connect Websocket: #{url}")
-      ws = WebSocket::Client::Simple.connect(url)
-      ws.close()
-      return true
+      result = system("node websocket/check.js #{url}")
+      return result
     rescue
       return false
     end
@@ -209,7 +206,7 @@ class Sw < Thor
   end
 
   def execute_remote(ssh, script)
-    system "ssh -i #{ssh[:pem]} #{ssh[:user]}@#{ssh[:server]} \"#{script}\""
+    system "#{ssh[:use_sudo] ? 'sudo ' : ''}ssh -i #{ssh[:pem]} #{ssh[:user]}@#{ssh[:server]} \"#{script}\""
   end
 
   def empty?(v)
@@ -219,13 +216,13 @@ class Sw < Thor
   class SwLog
 
     def self.error(content)
-      self.logger.error(content)
-      puts content
+      self.logger.error(content.colorize(:red))
+      puts content.colorize(:red)
     end
 
     def self.info(content)
-      self.logger.info(content)
-      puts content
+      self.logger.info(content.colorize(:green))
+      puts content.colorize(:green)
     end
 
     private
