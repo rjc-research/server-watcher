@@ -1,3 +1,3 @@
 every 1.minute do
-  system 'thor sw:start'
+  command "cd #{`pwd`.strip} && #{`which thor`.strip} sw:start"
 end
