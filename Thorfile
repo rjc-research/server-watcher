@@ -194,6 +194,11 @@ class Sw < Thor
   end
 
   def send_mail(_to, _subject, _body, _logs)
+    Mail.defaults do
+      delivery_method :sendmail, {
+        openssl_verify_mode: OpenSSL::SSL::VERIFY_NONE
+      }
+    end
     Mail.deliver do
       from('noreply@server-watch.com')
       to(_to)
@@ -216,13 +221,26 @@ class Sw < Thor
   class SwLog
 
     def self.error(content)
-      self.logger.error(content.colorize(:red))
-      puts content.colorize(:red)
+      if content.methods.include?(:message) && content.methods.include?(:backtrace)
+        if content.message
+          self.logger.error(content.message.colorize(:red))
+          puts content.message.colorize(:red)
+        end
+        if content.backtrace
+          content.backtrace.each do |line|
+            self.logger.error(line.colorize(:red))
+            puts line.colorize(:red)
+          end
+        end
+      else
+        self.logger.error(content.to_s.colorize(:red))
+        puts content.to_s.colorize(:red)
+      end
     end
 
     def self.info(content)
-      self.logger.info(content.colorize(:green))
-      puts content.colorize(:green)
+      self.logger.info(content.to_s.colorize(:green))
+      puts content.to_s.colorize(:green)
     end
 
     private
