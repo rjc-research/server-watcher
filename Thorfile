@@ -85,7 +85,7 @@ class Sw < Thor
       end
     end
     name          = config[:name]
-    url           = config[:url].gsub(/^https:\/\//, 'http://').gsub(/^wss:\/\//, 'ws://')
+    url           = config[:url].gsub(/^wss:\/\//, 'ws://')
     interval      = config[:interval]
     alert         = config[:alert]
     ssh           = config[:ssh]
@@ -178,6 +178,8 @@ class Sw < Thor
       SwLog.info(" - GET #{url}")
       uri = URI.parse(URI.encode(url))
       http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = url.start_with?('https')
+      http.verify_mode = 0
       response = http.get(uri.request_uri)
       is_success = response.code == '200'
       return [is_success, !is_success ? "HTTP #{response.code}" : '']
