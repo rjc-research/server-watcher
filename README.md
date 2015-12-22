@@ -1,6 +1,6 @@
 # SERVER-WATCHER
 
-Server Watcher is a lighweight tool that watches for your server shutdown.
+Server Watcher is a lightweight tool that watches for your server shutdown.
 
 # Features
 - Simple configuration
@@ -67,7 +67,7 @@ whenever -c
 ```
 
 - `name` name if you server
-- `url` url to check your server. If it returns status code 200, server is alive, otherwise server is down. Supported protocols: http/ws. https/wss url will be converted to http/ws
+- `url` url to check your server. For `http/https`, if it returns status code 200, server is alive, otherwise server is down. For `ws`, if client can open connection with server, server is alive, otherwise server is down. Supported protocols: `http/https/ws`. `wss` is converted to `ws`
 - `interval` number of **minutes** between server checkings
 - `alert` list of email address to receive notification email when one server is down
 - `ssh` configuration for ssh connection to remote server if you want to pull the logs or restart server automatically. The ssh command will be like this:
