@@ -5,7 +5,6 @@ require 'open-uri'
 require 'json'
 require 'mail'
 require 'colorize'
-
 require 'byebug'
 
 class Sw < Thor
@@ -16,6 +15,7 @@ class Sw < Thor
     File.open(path, 'w') do |f|
       f.write([
         "{",
+        "  active: false,",
         "  name: '#{name}',",
         "  url: 'http://mysite.com' || 'ws://mywebsocket.com',",
         "  interval: 1,",
@@ -95,6 +95,11 @@ class Sw < Thor
     # check config fields
     if !(url =~ URI::regexp)
       raise "'#{url}' is not an URL"
+    end
+
+    # check if config is active
+    if !config[:active]
+      return
     end
 
     # check if we should check server at this time

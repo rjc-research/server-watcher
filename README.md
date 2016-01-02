@@ -48,12 +48,13 @@ whenever -c
 # Configuration example
 ```ruby
 {
+  active: false,
   name: 'my_cool_server',
   url: 'http://mysite.com' || 'ws://mywebsocket.com',
   interval: 1,
   alert: ['email@example.com', 'other@example.com'],
   ssh: {
-    pem: './mysite.pem',
+    pem: '/path/to/your/mysite.pem',
     user: 'ubuntu',
     server: 'mysite.com' || '50.60.70.80',
     use_sudo: true
@@ -66,7 +67,8 @@ whenever -c
 }
 ```
 
-- `name` name if you server
+- `active` whether this configuration is ready to be executed
+- `name` name of you server
 - `url` url to check your server. For `http/https`, if it returns status code 200, server is alive, otherwise server is down. For `ws`, if client can open connection with server, server is alive, otherwise server is down. Supported protocols: `http/https/ws`. `wss` is converted to `ws`
 - `interval` number of **minutes** between server checkings
 - `alert` list of email address to receive notification email when one server is down
