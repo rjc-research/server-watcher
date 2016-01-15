@@ -110,9 +110,9 @@ class Sw < Thor
     # check if server is alive
     SwLog.info(":::CHECK SERVER '#{name}'")
     if url.start_with?('http')
-      is_on, err_msg = check_http(url)
+      is_on, err_msg, err_backtrace = check_http(url)
     elsif url.start_with?('ws')
-      is_on, err_msg = check_ws(url)
+      is_on, err_msg, err_backtrace = check_ws(url)
     else
       raise 'Protocol of url must be \'http/https\' or \'ws/wss\''
     end
@@ -123,8 +123,9 @@ class Sw < Thor
       return
     end
 
-    SwLog.info('SERVER DOWN!!!!!')
-    SwLog.info("Error: #{err_msg}")
+    SwLog.error('SERVER DOWN!!!!!')
+    SwLog.error("Error: #{err_msg}")
+    SwLog.error("  #{err_backtrace.join("\n  ")}")
     now = Time.now
 
     # pull log
@@ -155,6 +156,7 @@ class Sw < Thor
         "Name: #{name}",
         "Url: #{url}",
         "Error: #{err_msg}",
+        "Backtrace:\n  #{err_backtrace.join("\n  ")}",
         "At: #{now.to_s}",
         "Logs:\n  #{log_files.join("\n  ")}"
       ].join("\n")
@@ -187,9 +189,9 @@ class Sw < Thor
       http.verify_mode = 0
       response = http.get(uri.request_uri)
       is_success = response.code == '200'
-      return [is_success, !is_success ? "HTTP #{response.code}" : '']
+      return [is_success, !is_success ? "HTTP #{response.code}" : '', []]
     rescue Exception => e
-      return [false, e.message]
+      return [false, e.message, e.backtrace]
     end
   end
 
@@ -197,9 +199,9 @@ class Sw < Thor
     begin
       SwLog.info(" - Connect Websocket: #{url}")
       is_success = system("node websocket/check.js #{url}")
-      return [is_success, !is_success ? 'Failed to connect Websocket' : '']
+      return [is_success, !is_success ? 'Failed to connect Websocket' : '', []]
     rescue Exception => e
-      return [false, e.message]
+      return [false, e.message, e.backtrace]
     end
   end
 
