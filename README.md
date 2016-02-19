@@ -57,7 +57,7 @@ whenever -c
     pem: '/path/to/your/mysite.pem',
     user: 'ubuntu',
     server: 'mysite.com' || '50.60.70.80',
-    use_sudo: true
+    has_sudo_priviledge: true
   },
   log: {
     path: ['/home/ubuntu/mysite/log/production.log', '/home/ubuntu/mysite/log/other.log'],
@@ -74,7 +74,8 @@ whenever -c
 - `alert` list of email address to receive notification email when one server is down
 - `ssh` configuration for ssh connection to remote server if you want to pull the logs or restart server automatically. The ssh command will be like this:
 ```
-[sudo] ssh -i [ssh.pem] [ssh.user]@[ssh.server] <your command here>
+ssh [-i [ssh.pem]] [ssh.user]@[ssh.server] <your command here>
 ```
+- `ssh.has_sudo_priviledge` whether this user has sudo priviledge. This is used when creating tailed log files from original log files which are sometimes only accessible by using sudo
 - `log` configuration to pulling log files from remote server. `path` is location of the remote log files, and `lines` is number of last lines you want to get
 - `start_script` script to automatically restart server when it is down
