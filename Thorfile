@@ -24,7 +24,7 @@ class Sw < Thor
         "    pem: '/path/to/your/mysite.pem',",
         "    user: 'ubuntu',",
         "    server: 'mysite.com' || '50.60.70.80',",
-        "    use_sudo: true",
+        "    has_sudo_priviledge: true",
         "  },",
         "  log: {",
         "    path: ['/home/ubuntu/mysite/log/production.log', '/home/ubuntu/mysite/log/other.log'],",
@@ -137,10 +137,12 @@ class Sw < Thor
       end
       time_string = filenamize(now.to_s)
       log[:path].each do |lp|
+        sudo_part = ssh[:has_sudo_priviledge] ? 'sudo' : ''
         tailed_file = "~/[#{filenamize(name)}]_[#{time_string}]_#{File.basename(lp)}"
-        execute_remote(ssh, "tail -#{log[:lines]} #{lp} > #{tailed_file}")
-        system "#{ssh[:use_sudo] ? 'sudo ' : ''}scp -i #{ssh[:pem]} #{ssh[:user]}@#{ssh[:server]}:#{tailed_file} #{root}/servers/logs/"
-        execute_remote(ssh, "rm #{tailed_file}")
+        execute_remote(ssh, "#{sudo_part} tail -#{log[:lines]} #{lp} > #{tailed_file}")
+        pem_part = ssh[:pem] ? "-i #{ssh[:pem]}" : ''
+        system "scp #{pem_part} #{ssh[:user]}@#{ssh[:server]}:#{tailed_file} #{root}/servers/logs/"
+        execute_remote(ssh, "#{sudo_part} rm #{tailed_file}")
         local_log_file = "#{root}/servers/logs/#{File.basename(tailed_file)}"
         if File.exists?(local_log_file)
           log_files << local_log_file
@@ -223,7 +225,8 @@ class Sw < Thor
   end
 
   def execute_remote(ssh, script)
-    system "#{ssh[:use_sudo] ? 'sudo ' : ''}ssh -i #{ssh[:pem]} #{ssh[:user]}@#{ssh[:server]} \"#{script}\""
+    pem_part = ssh[:pem] ? "-i #{ssh[:pem]}" : ''
+    system "ssh #{pem_part} #{ssh[:user]}@#{ssh[:server]} \"#{script}\""
   end
 
   def empty?(v)
