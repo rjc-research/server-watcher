@@ -132,20 +132,27 @@ class Sw < Thor
     log_files = []
     if !empty?(log)
       SwLog.info(' - Pull logs files')
-      if empty?(ssh)
-        raise "'log' config depends on 'ssh' config"
-      end
       time_string = filenamize(now.to_s)
-      log[:path].each do |lp|
-        sudo_part = ssh[:has_sudo_priviledge] ? 'sudo' : ''
-        tailed_file = "~/[#{filenamize(name)}]_[#{time_string}]_#{File.basename(lp)}"
-        execute_remote(ssh, "#{sudo_part} tail -#{log[:lines]} #{lp} > #{tailed_file}")
-        pem_part = ssh[:pem] ? "-i #{ssh[:pem]}" : ''
-        system "scp #{pem_part} #{ssh[:user]}@#{ssh[:server]}:#{tailed_file} #{root}/servers/logs/"
-        execute_remote(ssh, "#{sudo_part} rm #{tailed_file}")
-        local_log_file = "#{root}/servers/logs/#{File.basename(tailed_file)}"
-        if File.exists?(local_log_file)
-          log_files << local_log_file
+      if !empty?(ssh)
+        log[:path].each do |lp|
+          sudo_part = ssh[:has_sudo_priviledge] ? 'sudo' : ''
+          tailed_file = "~/[#{filenamize(name)}]_[#{time_string}]_#{File.basename(lp)}"
+          execute_remote(ssh, "#{sudo_part} tail -#{log[:lines]} #{lp} > #{tailed_file}")
+          pem_part = ssh[:pem] ? "-i #{ssh[:pem]}" : ''
+          system "scp #{pem_part} #{ssh[:user]}@#{ssh[:server]}:#{tailed_file} #{root}/servers/logs/"
+          execute_remote(ssh, "#{sudo_part} rm #{tailed_file}")
+          local_log_file = "#{root}/servers/logs/#{File.basename(tailed_file)}"
+          if File.exists?(local_log_file)
+            log_files << local_log_file
+          end
+        end
+      else
+        log[:path].each do |lp|
+          log_file = "#{root}/servers/logs/[#{filenamize(name)}]_[#{time_string}]_#{File.basename(lp)}"
+          system "sudo tail -#{log[:lines]} #{lp} > #{log_file}"
+          if File.exists?(log_file)
+            log_files << log_file
+          end
         end
       end
       SwLog.info('   DONE')
@@ -174,10 +181,11 @@ class Sw < Thor
     # restart server
     if !empty?(start_script)
       SwLog.info(' - Restart server')
-      if empty?(ssh)
-        raise "'start_script' config depends on 'ssh' config"
+      if !empty?(ssh)
+        execute_remote(ssh, start_script.strip)
+      else
+        system(start_script.strip)
       end
-      execute_remote(ssh, start_script.strip)
       SwLog.info('   DONE')
     end
   end
