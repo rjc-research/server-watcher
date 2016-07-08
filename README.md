@@ -76,6 +76,7 @@ whenever -c
 ```
 ssh [-i [ssh.pem]] [ssh.user]@[ssh.server] <your command here>
 ```
+- If you don't set `ssh` configuration, all scripts to get log, start server, etc... will be executed on local.
 - `ssh.has_sudo_priviledge` whether this user has sudo priviledge. This is used when creating tailed log files from original log files which are sometimes only accessible by using sudo
 - `log` configuration to pulling log files from remote server. `path` is location of the remote log files, and `lines` is number of last lines you want to get
 - `start_script` script to automatically restart server when it is down
