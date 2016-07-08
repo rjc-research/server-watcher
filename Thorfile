@@ -149,7 +149,7 @@ class Sw < Thor
       else
         log[:path].each do |lp|
           log_file = "#{root}/servers/logs/[#{filenamize(name)}]_[#{time_string}]_#{File.basename(lp)}"
-          system "tail -#{log[:lines]} #{lp} > #{log_file}"
+          system "sudo tail -#{log[:lines]} #{lp} > #{log_file}"
           if File.exists?(log_file)
             log_files << log_file
           end
