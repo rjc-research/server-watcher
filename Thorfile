@@ -43,7 +43,7 @@ class Sw < Thor
     # load server configs
     configs = []
     SwLog.info(':::LOAD SERVER CONFIGS')
-    Dir["#{root}/servers/configs/*.rb"].each do |file|
+    Dir["#{root}/servers/configs/**/*.rb"].each do |file|
       begin
         SwLog.info(" - #{file}")
         configs << eval(File.read(file))
