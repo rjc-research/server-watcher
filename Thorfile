@@ -198,6 +198,13 @@ class Sw < Thor
       http.use_ssl = url.start_with?('https')
       http.verify_mode = 0
       response = http.get(uri.request_uri)
+      if response.code =~ /^30[0-9]$/
+        new_location = response.header && response.header['location']
+        if new_location && new_location != ''
+          SwLog.warn("Redirect to: #{new_location}")
+          return check_http(new_location)
+        end
+      end
       is_success = response.code == '200'
       return [is_success, !is_success ? "HTTP #{response.code}" : '', []]
     rescue Exception => e
@@ -264,6 +271,11 @@ class Sw < Thor
     def self.info(content)
       self.logger.info(content.to_s.colorize(:green))
       puts content.to_s.colorize(:green)
+    end
+
+    def self.warn(content)
+      self.logger.warn(content.to_s.colorize(:yellow))
+      puts content.to_s.colorize(:yellow)
     end
 
     private
