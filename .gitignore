@@ -38,6 +38,5 @@ build/
 log/*.log
 
 # ignore server config & log files
-servers/configs/*.rb
-servers/configs/*.pem
-servers/logs/*.log
+servers/configs/*
+servers/logs/*
