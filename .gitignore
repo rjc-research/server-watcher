@@ -38,5 +38,5 @@ build/
 log/*.log
 
 # ignore server config & log files
-servers/configs/*
+#servers/configs/*
 servers/logs/*
