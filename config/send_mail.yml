@@ -1,5 +1,5 @@
 # mail | actionmailer
-using_gem: mail
+using_gem: actionmailer
 from: noreply@server-watch.com
 
 # if `using_gem: actionmailer`
@@ -10,8 +10,8 @@ actionmailer:
   smtp_settings:
     address: smtp.gmail.com
     port: 587
-    domain: your.domain.com
-    user_name: noreply@your.domain.com
-    password: your_password_123
+    domain: rjc.co.jp
+    user_name: noreply@rjc.co.jp
+    password: yE3amE2TkRzuYmahvQad
     authentication: plain
     enable_starttls_auto: true
