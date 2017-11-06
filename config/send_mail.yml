@@ -1,0 +1,17 @@
+# mail | actionmailer
+using_gem: mail
+from: noreply@server-watch.com
+
+# if `using_gem: actionmailer`
+actionmailer:
+  perform_deliveries: true
+  raise_delivery_errors: true
+  delivery_method: smtp
+  smtp_settings:
+    address: smtp.gmail.com
+    port: 587
+    domain: your.domain.com
+    user_name: noreply@your.domain.com
+    password: your_password_123
+    authentication: plain
+    enable_starttls_auto: true
