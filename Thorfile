@@ -6,6 +6,8 @@ require 'json'
 require 'mail'
 require 'colorize'
 require 'byebug'
+require 'yaml'
+require 'action_mailer'
 
 class Sw < Thor
 
@@ -223,19 +225,43 @@ class Sw < Thor
   end
 
   def send_mail(_to, _subject, _body, _logs)
-    Mail.defaults do
-      delivery_method :sendmail, {
-        openssl_verify_mode: OpenSSL::SSL::VERIFY_NONE
-      }
-    end
-    Mail.deliver do
-      from('noreply@server-watch.com')
-      to(_to)
-      subject(_subject)
-      body(_body)
-      _logs.each do |file|
-        add_file(file)
+    send_mail_config = YAML.load_file(File.join(File.dirname(__FILE__), 'config/send_mail.yml'))
+
+    # using `mail` gem
+    if send_mail_config['using_gem'] == 'mail'
+      Mail.defaults do
+        delivery_method :sendmail, {
+          openssl_verify_mode: OpenSSL::SSL::VERIFY_NONE
+        }
       end
+      Mail.deliver do
+        from(send_mail_config['from'])
+        to(_to)
+        subject(_subject)
+        body(_body)
+        _logs.each do |file|
+          add_file(file)
+        end
+      end
+    end
+
+    # using `actionmailer` gem
+    if send_mail_config['using_gem'] == 'actionmailer'
+      ActionMailer::Base.perform_deliveries     = send_mail_config['actionmailer']['perform_deliveries']
+      ActionMailer::Base.raise_delivery_errors  = send_mail_config['actionmailer']['raise_delivery_errors']
+      ActionMailer::Base.delivery_method        = send_mail_config['actionmailer']['delivery_method']
+      ActionMailer::Base.smtp_settings = {
+        address:              send_mail_config['actionmailer']['smtp_settings']['address'],
+        port:                 send_mail_config['actionmailer']['smtp_settings']['port'],
+        domain:               send_mail_config['actionmailer']['smtp_settings']['domain'],
+        user_name:            send_mail_config['actionmailer']['smtp_settings']['user_name'],
+        password:             send_mail_config['actionmailer']['smtp_settings']['password'],
+        authentication:       send_mail_config['actionmailer']['smtp_settings']['authentication'],
+        enable_starttls_auto: send_mail_config['actionmailer']['smtp_settings']['enable_starttls_auto'],
+      }
+      require_relative './server_watcher_mailer.rb'
+      ServerWatcherMailer.notify_server_down(send_mail_config['from'], _to, _subject, _body, _logs)
+                         .deliver_now
     end
   end
 
