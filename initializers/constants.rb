@@ -3,5 +3,4 @@ ALERT_EMAIL_ADDRESSES = [
   'pang.chong@rjc.co.jp',
   'dai@rjc.co.jp',
   'yuki.yoshimoto@rjc.co.jp',
-  'shigenori.taya@rjc.co.jp',
 ]
