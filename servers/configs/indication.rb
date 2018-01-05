@@ -3,5 +3,5 @@
   name: 'indication',
   url: 'https://indication.wealth-park.com',
   interval: 1,
-  alert: ['butterfly.dev@rjc.co.jp']
+  alert: ALERT_EMAIL_ADDRESSES,
 }

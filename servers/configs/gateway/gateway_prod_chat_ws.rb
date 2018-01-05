@@ -3,7 +3,7 @@
   name: 'gateway/prod/chat/ws',
   url: 'wss://gateway.wealth-park.com/gateway/chat/ws',
   interval: 1,
-  alert: ['butterfly.dev@rjc.co.jp'],
+  alert: ALERT_EMAIL_ADDRESSES,
   ssh: {
     user: 'ubuntu',
     server: 'gateway.wealth-park.com',

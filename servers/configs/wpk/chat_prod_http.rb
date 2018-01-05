@@ -3,7 +3,7 @@
   name: 'chat/prod/http',
   url: 'https://chat.wealth-park.com/api/check_alive',
   interval: 1,
-  alert: ['butterfly.dev@rjc.co.jp'],
+  alert: ALERT_EMAIL_ADDRESSES,
   ssh: {
     user: 'ubuntu',
     server: 'chat.wealth-park.com',

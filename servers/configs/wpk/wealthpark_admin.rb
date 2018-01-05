@@ -3,7 +3,7 @@
   name: 'wealthpark-admin',
   url: 'https://live.wealth-park.com',
   interval: 1,
-  alert: ['butterfly.dev@rjc.co.jp'],
+  alert: ALERT_EMAIL_ADDRESSES,
   ssh: {
     user: 'ubuntu',
     server: 'live.wealth-park.com',

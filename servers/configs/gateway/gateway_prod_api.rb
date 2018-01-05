@@ -3,7 +3,7 @@
   name: 'gateway/prod/api',
   url: 'https://gateway.wealth-park.com/gateway/api/check_alive',
   interval: 1,
-  alert: ['butterfly.dev@rjc.co.jp'],
+  alert: ALERT_EMAIL_ADDRESSES,
   ssh: {
     user: 'ubuntu',
     server: 'gateway.wealth-park.com',

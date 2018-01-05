@@ -3,7 +3,7 @@
   name: 'redhorse/api/prod',
   url: 'https://redhorse.wealth-park.com/api/v4/check_alive',
   interval: 1,
-  alert: ['butterfly.dev@rjc.co.jp'],
+  alert: ALERT_EMAIL_ADDRESSES,
 =begin
   ssh: {
     user: 'ubuntu',

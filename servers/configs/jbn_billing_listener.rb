@@ -3,7 +3,7 @@
   name: 'jbn_billing_listener',
   url: 'http://prod.wealth-park.com/billing/alive',
   interval: 1,
-  alert: ['butterfly.dev@rjc.co.jp'],
+  alert: ALERT_EMAIL_ADDRESSES,
   ssh: {
     user: 'ubuntu',
     server: 'prod.wealth-park.com',

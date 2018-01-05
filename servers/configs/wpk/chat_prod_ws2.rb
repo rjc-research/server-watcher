@@ -3,7 +3,7 @@
   name: 'chat/prod/ws2',
   url: 'wss://chat.wealth-park.com/chat/c14eef71-c03f-4ef5-a3ad-8dfe741c7fe1',
   interval: 1,
-  alert: ['butterfly.dev@rjc.co.jp'],
+  alert: ALERT_EMAIL_ADDRESSES,
   ssh: {
     user: 'ubuntu',
     server: 'chat.wealth-park.com',

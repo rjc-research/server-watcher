@@ -3,7 +3,7 @@
   name: 'redhorse/chat/prod/admin',
   url: 'https://redhorse.wealth-park.com/webchat',
   interval: 1,
-  alert: ['butterfly.dev@rjc.co.jp'],
+  alert: ALERT_EMAIL_ADDRESSES,
 =begin
   ssh: {
     user: 'ubuntu',

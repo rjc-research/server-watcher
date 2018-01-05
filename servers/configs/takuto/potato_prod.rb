@@ -3,7 +3,7 @@
   name: 'takuto/potato/production',
   url: 'https://takuto.wealth-park.com',
   interval: 1,
-  alert: ['butterfly.dev@rjc.co.jp'],
+  alert: ALERT_EMAIL_ADDRESSES,
 =begin
   ssh: {
     user: 'ubuntu',
