@@ -8,6 +8,9 @@ require 'colorize'
 require 'byebug'
 require 'yaml'
 require 'action_mailer'
+require 'require_all'
+
+require_all 'initializers'
 
 class Sw < Thor
 
