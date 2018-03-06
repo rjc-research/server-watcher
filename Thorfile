@@ -90,7 +90,7 @@ class Sw < Thor
       end
     end
     name          = config[:name]
-    url           = config[:url].gsub(/^wss:\/\//, 'ws://')
+    url           = config[:url]
     interval      = config[:interval]
     alert         = config[:alert]
     ssh           = config[:ssh]
