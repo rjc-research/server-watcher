@@ -51,6 +51,7 @@ whenever -c
   active: false,
   name: 'my_cool_server',
   url: 'http://mysite.com' || 'ws://mywebsocket.com',
+  custom_http_check: lambda { |response| nil },
   interval: 1,
   alert: ['email@example.com', 'other@example.com'],
   ssh: {
@@ -69,7 +70,8 @@ whenever -c
 
 - `active` whether this configuration is ready to be executed
 - `name` name of you server
-- `url` url to check your server. For `http/https`, if it returns status code 200, server is alive, otherwise server is down. For `ws`, if client can open connection with server, server is alive, otherwise server is down. Supported protocols: `http/https/ws`. `wss` is converted to `ws`
+- `url` url to check your server. For `http/https`, if it returns status code 200, server is alive, otherwise server is down. For `ws`, if client can open connection with server, server is alive, otherwise server is down. Supported protocols: `http/https/ws/wss`.
+- `custom_http_check` customization for checking result of http/https request. Returning any thing other than `false` or `nil` means request is invalid. 
 - `interval` number of **minutes** between server checkings
 - `alert` list of email address to receive notification email when one server is down
 - `ssh` configuration for ssh connection to remote server if you want to pull the logs or restart server automatically. The ssh command will be like this:
