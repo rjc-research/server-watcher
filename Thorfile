@@ -23,6 +23,7 @@ class Sw < Thor
         "  active: false,",
         "  name: '#{name}',",
         "  url: 'http://mysite.com' || 'ws://mywebsocket.com',",
+        "  custom_http_check: lambda { |response| nil },",
         "  interval: 1,",
         "  alert: ['email@example.com', 'other@example.com'],",
         "  ssh: {",
@@ -91,6 +92,7 @@ class Sw < Thor
     end
     name          = config[:name]
     url           = config[:url]
+    custom_http_check = config[:custom_http_check]
     interval      = config[:interval]
     alert         = config[:alert]
     ssh           = config[:ssh]
@@ -100,6 +102,9 @@ class Sw < Thor
     # check config fields
     if !(url =~ URI::regexp)
       raise "'#{url}' is not an URL"
+    end
+    if custom_http_check && !custom_http_check.is_a?(Proc)
+      raise '`custom_http_check` field must be lambda or proc'
     end
 
     # check if config is active
@@ -115,7 +120,7 @@ class Sw < Thor
     # check if server is alive
     SwLog.info(":::CHECK SERVER '#{name}'")
     if url.start_with?('http')
-      is_on, err_msg, err_backtrace = check_http(url)
+      is_on, err_msg, err_backtrace = check_http(url, custom_http_check)
     elsif url.start_with?('ws')
       is_on, err_msg, err_backtrace = check_ws(url)
     else
@@ -195,7 +200,7 @@ class Sw < Thor
     end
   end
 
-  def check_http(url)
+  def check_http(url, custom_http_check)
     begin
       SwLog.info(" - GET #{url}")
       uri = URI.parse(URI.encode(url))
@@ -207,11 +212,21 @@ class Sw < Thor
         new_location = response.header && response.header['location']
         if new_location && new_location != ''
           SwLog.warn("Redirect to: #{new_location}")
-          return check_http(new_location)
+          return check_http(new_location, custom_http_check)
         end
       end
-      is_success = response.code == '200'
-      return [is_success, !is_success ? "HTTP #{response.code}" : '', []]
+      if response.code == '200'
+        is_success = true
+        err_msg = ''
+        if custom_http_check && custom_http_check.call(response) == false
+          is_success = false
+          err_msg = "`custom_http_check` method returns false. response.body = #{response.body}"
+        end
+      else
+        is_success = false
+        err_msg = "Server return HTTP error code #{response.code}"
+      end
+      return [is_success, err_msg, []]
     rescue Exception => e
       return [false, e.message, e.backtrace]
     end
