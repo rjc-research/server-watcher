@@ -218,9 +218,9 @@ class Sw < Thor
       if response.code == '200'
         is_success = true
         err_msg = ''
-        if custom_http_check && custom_http_check.call(response) == false
+        if custom_http_check && (custom_http_check_result = custom_http_check.call(response))
           is_success = false
-          err_msg = "`custom_http_check` method returns false. response.body = #{response.body}"
+          err_msg = "`custom_http_check` method returns: #{custom_http_check_result}"
         end
       else
         is_success = false
