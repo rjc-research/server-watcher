@@ -25,6 +25,11 @@ class Sw < Thor
     NewPmTask.new.do(pm_company)
   end
 
+  desc(RemovePmTask::NAME, RemovePmTask::DESCRIPTION)
+  def remove_pm(pm_company)
+    RemovePmTask.new.do(pm_company)
+  end
+
   desc(StartTask::NAME, StartTask::DESCRIPTION)
   def start
     StartTask.new.do()
