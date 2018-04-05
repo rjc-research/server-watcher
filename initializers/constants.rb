@@ -1,5 +1,5 @@
 ALERT_EMAIL_ADDRESSES = [
-  'datdo@rjc.co.jp',
-  'pang.chong@rjc.co.jp',
+  'datdo@wealth-park.com',
+  'pang.chong@wealth-park.com',
   'server@wealth-park.com',
 ]
