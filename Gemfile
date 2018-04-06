@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 ruby '2.2.1'
 
+gem 'eventmachine', '1.2.5'
 gem 'whenever', '0.9.4'
 gem 'thor', '0.19.1'
 gem 'mail', '2.6.3'

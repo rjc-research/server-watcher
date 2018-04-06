@@ -10,6 +10,8 @@ require 'yaml'
 require 'action_mailer'
 require 'require_all'
 require 'fileutils'
+require 'eventmachine'
+require 'fiber'
 
 require_all 'initializers'
 require_all 'thor'
