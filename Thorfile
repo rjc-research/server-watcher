@@ -9,6 +9,8 @@ require 'byebug'
 require 'yaml'
 require 'action_mailer'
 require 'require_all'
+require 'eventmachine'
+require 'fiber'
 
 require_all 'initializers'
 require_all 'thor'

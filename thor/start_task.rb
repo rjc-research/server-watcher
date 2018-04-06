@@ -4,32 +4,62 @@ class StartTask
   NAME = 'start'
   DESCRIPTION = 'Run Server-Watcher server'
 
+  def initialize(*args)
+    super(*args)
+    @logger = EMThreadSafeLogger.new("log/watcher.log")
+  end
+
   def do
+    task_started_at = Time.now
+
     # load server configs
     configs = []
-    SwLog.info(':::LOAD SERVER CONFIGS')
+    @logger.info(':::LOAD SERVER CONFIGS')
+    load_success_count = 0
+    load_failure_count = 0
     Dir["#{root}/servers/configs/**/*.rb"].each do |file|
       begin
-        SwLog.info(" - #{file}")
+        @logger.info(" - #{file}")
         configs << eval(File.read(file))
+        load_success_count += 1
       rescue Exception => e
-        SwLog.error("Failed to load server config file: #{file}")
-        SwLog.error(e)
-        return
+        load_failure_count += 1
+        @logger.error("Failed to load server config file: #{file}")
+        @logger.error(e)
       end
     end
-    SwLog.info('DONE')
+    @logger.info("DONE LOADING: #{load_success_count} success, #{load_failure_count} failure")
 
     # check servers
-    configs.each do |c|
-      begin
-        check(c)
-      rescue Exception => e
-        SwLog.error('Failed to check server')
-        SwLog.error(JSON.pretty_generate(c))
-        SwLog.error(e)
-      end
-    end
+    EM.run {
+      Fiber.new {
+        count = 0
+        @check_success_count = 0
+        @check_failure_count = 0
+        fiber = Fiber.current()
+        configs.each do |c|
+          EM.defer {
+            begin
+              check(c)
+            rescue Exception => e
+              @logger.error('Failed to check server')
+              @logger.error(JSON.pretty_generate(c))
+              @logger.error(e)
+            end
+            @logger.flush_thread_logs()
+            count += 1
+            if count == configs.length
+              EM.next_tick {
+                fiber.resume()
+              }
+            end
+          }
+        end
+        Fiber.yield()
+        @logger.info("DONE CHECKING: #{@check_success_count} success, #{@check_failure_count} failure, took #{Time.now - task_started_at} seconds")
+        EM.stop()
+      }.resume()
+    }
   end
 
   private 
@@ -69,7 +99,7 @@ class StartTask
     end
 
     # check if server is alive
-    SwLog.info(":::CHECK SERVER '#{name}'")
+    @logger.info(":::CHECK SERVER '#{name}'")
     if url.start_with?('http')
       is_on, err_msg, err_backtrace = check_http(url, custom_http_check)
     elsif url.start_with?('ws')
@@ -80,19 +110,22 @@ class StartTask
 
     # if server is on, do nothing
     if is_on
-      SwLog.info('OK')
+      @check_success_count += 1
+      @logger.info('OK')
       return
+    else
+      @check_failure_count += 1
     end
 
-    SwLog.error('SERVER DOWN!!!!!')
-    SwLog.error("Error: #{err_msg}")
-    SwLog.error("  #{err_backtrace.join("\n  ")}")
+    @logger.error('SERVER DOWN!!!!!')
+    @logger.error("Error: #{err_msg}")
+    @logger.error("  #{err_backtrace.join("\n  ")}")
     now = Time.now
 
     # pull log
     log_files = []
     if !empty?(log)
-      SwLog.info(' - Pull logs files')
+      @logger.info(' - Pull logs files')
       time_string = filenamize(now.to_s)
       if !empty?(ssh)
         log[:path].each do |lp|
@@ -116,12 +149,12 @@ class StartTask
           end
         end
       end
-      SwLog.info('   DONE')
+      @logger.info('   DONE')
     end
 
     # send mail
     if !empty?(alert)
-      SwLog.info(' - Send alert email')
+      @logger.info(' - Send alert email')
       content = [
         "Name: #{name}",
         "Url: #{url}",
@@ -136,24 +169,24 @@ class StartTask
         content,
         log_files
       )
-      SwLog.info('   DONE')
+      @logger.info('   DONE')
     end
 
     # restart server
     if !empty?(start_script)
-      SwLog.info(' - Restart server')
+      @logger.info(' - Restart server')
       if !empty?(ssh)
         execute_remote(ssh, start_script.strip)
       else
         system(start_script.strip)
       end
-      SwLog.info('   DONE')
+      @logger.info('   DONE')
     end
   end
 
   def check_http(url, custom_http_check)
     begin
-      SwLog.info(" - GET #{url}")
+      @logger.info(" - GET #{url}")
       uri = URI.parse(URI.encode(url))
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = url.start_with?('https')
@@ -162,7 +195,7 @@ class StartTask
       if response.code =~ /^30[0-9]$/
         new_location = response.header && response.header['location']
         if new_location && new_location != ''
-          SwLog.warn("Redirect to: #{new_location}")
+          @logger.warn("Redirect to: #{new_location}")
           return check_http(new_location, custom_http_check)
         end
       end
@@ -185,7 +218,7 @@ class StartTask
 
   def check_ws(url)
     begin
-      SwLog.info(" - Connect Websocket: #{url}")
+      @logger.info(" - Connect Websocket: #{url}")
       is_success = system("node websocket/check.js #{url}")
       return [is_success, !is_success ? 'Failed to connect Websocket' : '', []]
     rescue Exception => e
