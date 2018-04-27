@@ -227,7 +227,7 @@ class StartTask
   end
 
   def send_mail(_to, _subject, _body, _logs)
-    send_mail_config = YAML.load_file(File.join(File.dirname(__FILE__), 'config/send_mail.yml'))
+    send_mail_config = YAML.load_file(File.join(File.dirname(__FILE__), '../config/send_mail.yml'))
 
     # using `mail` gem
     if send_mail_config['using_gem'] == 'mail'
