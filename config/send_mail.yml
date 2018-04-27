@@ -10,8 +10,8 @@ actionmailer:
   smtp_settings:
     address: smtp.gmail.com
     port: 587
-    domain: rjc.co.jp
-    user_name: noreply@rjc.co.jp
-    password: yE3amE2TkRzuYmahvQad
+    domain: wealth-park.com
+    user_name: noreply@wealth-park.com
+    password: Xb^*7#f!
     authentication: plain
     enable_starttls_auto: true
