@@ -20,5 +20,5 @@
     ],
     lines: 2000
   },
-  #start_script: "cd /home/ubuntu/wealthpark-chat/server && ./scripts/deploy/ws.sh restart production"
+  start_script: "cd /home/ubuntu/wealthpark-chat/server && ./scripts/deploy/ws.sh restart production"
 }
