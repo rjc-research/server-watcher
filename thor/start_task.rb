@@ -261,7 +261,7 @@ class StartTask
         authentication:       send_mail_config['actionmailer']['smtp_settings']['authentication'],
         enable_starttls_auto: send_mail_config['actionmailer']['smtp_settings']['enable_starttls_auto'],
       }
-      require_relative './server_watcher_mailer.rb'
+      require_relative '../server_watcher_mailer.rb'
       ServerWatcherMailer.notify_server_down(send_mail_config['from'], _to, _subject, _body, _logs)
                          .deliver_now
     end
