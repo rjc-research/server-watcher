@@ -72,7 +72,7 @@ class StartTask
       end
     end
     name          = config[:name]
-    url           = config[:url]
+    urls = (config[:url].is_a?(Array) ? config[:url] : [ config[:url] ]) || []
     custom_http_check = config[:custom_http_check]
     interval      = config[:interval]
     alert         = config[:alert]
@@ -81,9 +81,12 @@ class StartTask
     start_script  = config[:start_script]
 
     # check config fields
-    if !(url =~ URI::regexp)
-      raise "'#{url}' is not an URL"
-    end
+    urls.each {
+      |url|
+      if !(url =~ URI::regexp)
+        raise "'#{url}' is not an URL"
+      end
+    }
     if custom_http_check && !custom_http_check.is_a?(Proc)
       raise '`custom_http_check` field must be lambda or proc'
     end
@@ -100,13 +103,24 @@ class StartTask
 
     # check if server is alive
     @logger.info(":::CHECK SERVER '#{name}'")
-    if url.start_with?('http')
-      is_on, err_msg, err_backtrace = check_http(url, custom_http_check)
-    elsif url.start_with?('ws')
-      is_on, err_msg, err_backtrace = check_ws(url)
-    else
-      raise 'Protocol of url must be \'http/https\' or \'ws/wss\''
-    end
+    is_on = false
+    err_msg = nil
+    err_backtrace = nil
+    failed_url = nil
+    urls.each {
+      |url|
+      if url.start_with?('http')
+        is_on, err_msg, err_backtrace = check_http(url, custom_http_check)
+      elsif url.start_with?('ws')
+        is_on, err_msg, err_backtrace = check_ws(url)
+      else
+        raise 'Protocol of url must be \'http/https\' or \'ws/wss\''
+      end
+      unless is_on
+        failed_url = url
+        break
+      end
+    }
 
     # if server is on, do nothing
     if is_on
@@ -157,7 +171,7 @@ class StartTask
       @logger.info(' - Send alert email')
       content = [
         "Name: #{name}",
-        "Url: #{url}",
+        "Url: #{failed_url}",
         "Error: #{err_msg}",
         "Backtrace:\n  #{err_backtrace.join("\n  ")}",
         "At: #{now.to_s}",
@@ -188,19 +202,16 @@ class StartTask
     begin
       @logger.info(" - GET #{url}")
       response = RestClient.get(url)
-      if response.net_http_res.code == '200'
-        is_success = true
-        err_msg = ''
-        if custom_http_check && (custom_http_check_result = custom_http_check.call(response))
-          is_success = false
-          err_msg = "`custom_http_check` method returns: #{custom_http_check_result}"
-        end
-      else
+      # status code == 200
+      is_success = true
+      err_msg = ''
+      if custom_http_check && (custom_http_check_result = custom_http_check.call(response))
         is_success = false
-        err_msg = "Server return HTTP error code #{response.net_http_res.code}"
+        err_msg = "`custom_http_check` method returns: #{custom_http_check_result}"
       end
       return [is_success, err_msg, []]
     rescue Exception => e
+      # status code != 200
       return [false, e.message, e.backtrace]
     end
   end
