@@ -72,7 +72,7 @@ class StartTask
       end
     end
     name          = config[:name]
-    url           = config[:url]
+    urls = (config[:url].is_a?(Array) ? config[:url] : [ config[:url] ]) || []
     custom_http_check = config[:custom_http_check]
     interval      = config[:interval]
     alert         = config[:alert]
@@ -81,9 +81,12 @@ class StartTask
     start_script  = config[:start_script]
 
     # check config fields
-    if !(url =~ URI::regexp)
-      raise "'#{url}' is not an URL"
-    end
+    urls.each {
+      |url|
+      if !(url =~ URI::regexp)
+        raise "'#{url}' is not an URL"
+      end
+    }
     if custom_http_check && !custom_http_check.is_a?(Proc)
       raise '`custom_http_check` field must be lambda or proc'
     end
@@ -100,13 +103,24 @@ class StartTask
 
     # check if server is alive
     @logger.info(":::CHECK SERVER '#{name}'")
-    if url.start_with?('http')
-      is_on, err_msg, err_backtrace = check_http(url, custom_http_check)
-    elsif url.start_with?('ws')
-      is_on, err_msg, err_backtrace = check_ws(url)
-    else
-      raise 'Protocol of url must be \'http/https\' or \'ws/wss\''
-    end
+    is_on = false
+    err_msg = nil
+    err_backtrace = nil
+    failed_url = nil
+    urls.each {
+      |url|
+      if url.start_with?('http')
+        is_on, err_msg, err_backtrace = check_http(url, custom_http_check)
+      elsif url.start_with?('ws')
+        is_on, err_msg, err_backtrace = check_ws(url)
+      else
+        raise 'Protocol of url must be \'http/https\' or \'ws/wss\''
+      end
+      unless is_on
+        failed_url = url
+        break
+      end
+    }
 
     # if server is on, do nothing
     if is_on
@@ -157,7 +171,7 @@ class StartTask
       @logger.info(' - Send alert email')
       content = [
         "Name: #{name}",
-        "Url: #{url}",
+        "Url: #{failed_url}",
         "Error: #{err_msg}",
         "Backtrace:\n  #{err_backtrace.join("\n  ")}",
         "At: #{now.to_s}",
@@ -187,31 +201,17 @@ class StartTask
   def check_http(url, custom_http_check)
     begin
       @logger.info(" - GET #{url}")
-      uri = URI.parse(URI.encode(url))
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = url.start_with?('https')
-      http.verify_mode = 0
-      response = http.get(uri.request_uri)
-      if response.code =~ /^30[0-9]$/
-        new_location = response.header && response.header['location']
-        if new_location && new_location != ''
-          @logger.warn("Redirect to: #{new_location}")
-          return check_http(new_location, custom_http_check)
-        end
-      end
-      if response.code == '200'
-        is_success = true
-        err_msg = ''
-        if custom_http_check && (custom_http_check_result = custom_http_check.call(response))
-          is_success = false
-          err_msg = "`custom_http_check` method returns: #{custom_http_check_result}"
-        end
-      else
+      response = RestClient.get(url)
+      # status code == 200
+      is_success = true
+      err_msg = ''
+      if custom_http_check && (custom_http_check_result = custom_http_check.call(response))
         is_success = false
-        err_msg = "Server return HTTP error code #{response.code}"
+        err_msg = "`custom_http_check` method returns: #{custom_http_check_result}"
       end
       return [is_success, err_msg, []]
     rescue Exception => e
+      # status code != 200
       return [false, e.message, e.backtrace]
     end
   end

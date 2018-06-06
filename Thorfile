@@ -1,6 +1,6 @@
 require 'logger'
 require 'uri'
-require 'net/http'
+require 'rest-client'
 require 'open-uri'
 require 'json'
 require 'mail'
