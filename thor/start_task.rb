@@ -187,19 +187,8 @@ class StartTask
   def check_http(url, custom_http_check)
     begin
       @logger.info(" - GET #{url}")
-      uri = URI.parse(URI.encode(url))
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = url.start_with?('https')
-      http.verify_mode = 0
-      response = http.get(uri.request_uri)
-      if response.code =~ /^30[0-9]$/
-        new_location = response.header && response.header['location']
-        if new_location && new_location != ''
-          @logger.warn("Redirect to: #{new_location}")
-          return check_http(new_location, custom_http_check)
-        end
-      end
-      if response.code == '200'
+      response = RestClient.get(url)
+      if response.net_http_res.code == '200'
         is_success = true
         err_msg = ''
         if custom_http_check && (custom_http_check_result = custom_http_check.call(response))
@@ -208,7 +197,7 @@ class StartTask
         end
       else
         is_success = false
-        err_msg = "Server return HTTP error code #{response.code}"
+        err_msg = "Server return HTTP error code #{response.net_http_res.code}"
       end
       return [is_success, err_msg, []]
     rescue Exception => e
