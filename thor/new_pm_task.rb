@@ -19,7 +19,7 @@ class NewPmTask
     folder = "servers/configs/gateway/services/#{pm_company}"
     FileUtils.mkdir_p(folder)
     new_file("#{folder}/api.rb", $gateway_api % { pm_company: pm_company })
-    (0..3).each {
+    (0..1).each {
       |i|
       port = "801#{i}"
       new_file("#{folder}/chat-#{port}.rb", $gateway_chat % { pm_company: pm_company, port: port })
