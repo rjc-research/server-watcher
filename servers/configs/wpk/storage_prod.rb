@@ -2,7 +2,7 @@
   active: true,
   name: 'storage/prod',
   url: 'https://storage.wealth-park.com/api/v1/check_alive',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
   # ssh: {
   #   user: 'ubuntu',

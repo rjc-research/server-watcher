@@ -2,7 +2,7 @@
   active: true,
   name: 'jbn_billing_listener',
   url: 'http://prod.wealth-park.com/billing/alive',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
   ssh: {
     user: 'ubuntu',

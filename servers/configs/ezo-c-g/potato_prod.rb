@@ -7,6 +7,6 @@
     'https://ezo-c-g.wealth-park.com/bundles/potatoweb/js/admin_base.js',
     'https://ezo-c-g.wealth-park.com/bundles/potatoweb/css/style_pnl.css',
   ],
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
 }

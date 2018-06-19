@@ -41,7 +41,7 @@ $api_prod = %{{
   active: true,
   name: '%{pm_company}/api/prod',
   url: 'https://%{pm_company}.wealth-park.com/api/v4/check_alive',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
 }}
 
@@ -49,7 +49,7 @@ $chat_admin_prod = %{{
   active: true,
   name: '%{pm_company}/chat/prod/admin',
   url: 'https://%{pm_company}.wealth-park.com/webchat',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
 }}
 
@@ -57,7 +57,7 @@ $chat_http_prod = %{{
   active: true,
   name: '%{pm_company}/chat/prod/http',
   url: 'https://%{pm_company}.wealth-park.com/chat/api/check_alive',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
 }}
 
@@ -65,7 +65,7 @@ $chat_ws_prod = %{{
   active: true,
   name: '%{pm_company}/chat/prod/ws2',
   url: 'wss://%{pm_company}.wealth-park.com/chat/ws',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
 }}
 
@@ -78,7 +78,7 @@ $potato_prod = %{{
     'https://%{pm_company}.wealth-park.com/bundles/potatoweb/js/admin_base.js',
     'https://%{pm_company}.wealth-park.com/bundles/potatoweb/css/style_pnl.css',
   ],
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
 }}
 
@@ -86,7 +86,7 @@ $storage_prod = %{{
   active: true,
   name: '%{pm_company}/storage/prod',
   url: 'https://%{pm_company}.wealth-park.com/storage/api/v1/check_alive',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
 }}
 
@@ -95,7 +95,7 @@ $gateway_api = %{{
   active: true,
   name: 'gateway/services/%{pm_company}/api',
   url: 'https://gateway.wealth-park.com/gateway/api/check_service_connecting/%{pm_company}-api',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
 }}
 
@@ -103,7 +103,7 @@ $gateway_chat = %{{
   active: true,
   name: 'gateway/services/%{pm_company}/chat-%{port}',
   url: 'https://gateway.wealth-park.com/gateway/api/check_service_connecting/%{pm_company}-chat-%{port}',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
 }}
 
@@ -111,6 +111,6 @@ $gateway_storage = %{{
   active: true,
   name: 'gateway/services/%{pm_company}/storage',
   url: 'https://gateway.wealth-park.com/gateway/api/check_service_connecting/%{pm_company}-storage',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
 }}

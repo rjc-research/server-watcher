@@ -2,7 +2,7 @@
   active: true,
   name: 'chat/prod/http',
   url: 'https://chat.wealth-park.com/api/check_alive',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
   # ssh: {
   #   user: 'ubuntu',

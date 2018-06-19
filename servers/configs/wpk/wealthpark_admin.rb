@@ -2,7 +2,7 @@
   active: true,
   name: 'wealthpark-admin',
   url: 'https://live.wealth-park.com',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
   # ssh: {
   #   user: 'ubuntu',

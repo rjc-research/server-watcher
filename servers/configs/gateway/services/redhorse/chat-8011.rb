@@ -2,6 +2,6 @@
   active: true,
   name: 'gateway/services/redhorse/chat-8011',
   url: 'https://gateway.wealth-park.com/gateway/api/check_service_connecting/redhorse-chat-8011',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
 }

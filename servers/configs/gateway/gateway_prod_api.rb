@@ -2,7 +2,7 @@
   active: true,
   name: 'gateway/prod/api',
   url: 'https://gateway.wealth-park.com/gateway/api/check_alive',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
   # ssh: {
   #   user: 'ubuntu',

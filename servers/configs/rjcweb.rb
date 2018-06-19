@@ -2,7 +2,7 @@
   active: true,
   name: 'rjcweb',
   url: 'https://www.rjc.co.jp',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
   ssh: {
     user: 'bitnami',

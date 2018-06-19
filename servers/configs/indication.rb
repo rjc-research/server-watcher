@@ -2,6 +2,6 @@
   active: true,
   name: 'indication',
   url: 'https://indication.wealth-park.com',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
 }

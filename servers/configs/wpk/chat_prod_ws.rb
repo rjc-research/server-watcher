@@ -2,7 +2,7 @@
   active: true,
   name: 'chat/prod/ws',
   url: 'wss://chat.wealth-park.com/chat/ws',
-  interval: 1,
+  interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
   # ssh: {
   #   user: 'ubuntu',
