@@ -74,9 +74,6 @@ $potato_prod = %{{
   name: '%{pm_company}/potato/production',
   url: [
     'https://%{pm_company}.wealth-park.com',
-    'https://%{pm_company}.wealth-park.com/bundles/potatoweb/css/admin_base.css',
-    'https://%{pm_company}.wealth-park.com/bundles/potatoweb/js/admin_base.js',
-    'https://%{pm_company}.wealth-park.com/bundles/potatoweb/css/style_pnl.css',
   ],
   interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
