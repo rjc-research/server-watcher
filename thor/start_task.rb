@@ -6,7 +6,7 @@ class StartTask
 
   def initialize(*args)
     super(*args)
-    @logger = EMThreadSafeLogger.new("log/watcher.log")
+    @logger = EMThreadSafeLogger.new("log/watcher.log", 'daily')
   end
 
   def do
