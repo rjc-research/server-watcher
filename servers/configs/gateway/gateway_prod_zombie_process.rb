@@ -5,7 +5,7 @@
   custom_http_check: lambda {
     |response|
     json = JSON.parse(response.body, symbolize_names: true)
-    if json[:err] == 0
+    if json[:err] == 990 && json[:err_msg] == 'Zombie process found: demo-api'
       nil
     else
       response.body
