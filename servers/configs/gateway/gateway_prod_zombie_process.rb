@@ -1,5 +1,5 @@
 {
-  active: true,
+  active: false,
   name: 'gateway/prod/zombie_process',
   url: 'https://gateway.wealth-park.com/gateway/api/check_zombie_processes',
   custom_http_check: lambda {
