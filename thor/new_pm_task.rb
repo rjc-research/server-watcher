@@ -18,7 +18,7 @@ class NewPmTask
     # create watcher for gateway
     folder = "servers/configs/gateway/services/#{pm_company}"
     FileUtils.mkdir_p(folder)
-    new_file("#{folder}/api.rb", $gateway_api % { pm_company: pm_company })
+    # new_file("#{folder}/api.rb", $gateway_api % { pm_company: pm_company })
     (0..1).each {
       |i|
       port = "801#{i}"
@@ -88,13 +88,13 @@ $storage_prod = %{{
 }}
 
 
-$gateway_api = %{{
-  active: true,
-  name: 'gateway/services/%{pm_company}/api',
-  url: 'https://gateway.wealth-park.com/gateway/api/check_service_connecting/%{pm_company}-api',
-  interval: INTERVAL,
-  alert: ALERT_EMAIL_ADDRESSES,
-}}
+# $gateway_api = %{{
+#   active: true,
+#   name: 'gateway/services/%{pm_company}/api',
+#   url: 'https://gateway.wealth-park.com/gateway/api/check_service_connecting/%{pm_company}-api',
+#   interval: INTERVAL,
+#   alert: ALERT_EMAIL_ADDRESSES,
+# }}
 
 $gateway_chat = %{{
   active: true,
