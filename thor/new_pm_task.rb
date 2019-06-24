@@ -43,6 +43,7 @@ $api_prod = %{{
   url: 'https://%{pm_company}.wealth-park.com/api/v4/check_alive',
   interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
+  custom_http_check: API_CUSTOM_HTTP_CHECK,
 }}
 
 $chat_admin_prod = %{{
@@ -51,6 +52,7 @@ $chat_admin_prod = %{{
   url: 'https://%{pm_company}.wealth-park.com/webchat',
   interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
+  custom_http_check: CHAT_ADMIN_CUSTOM_HTTP_CHECK,
 }}
 
 $chat_http_prod = %{{
@@ -59,6 +61,7 @@ $chat_http_prod = %{{
   url: 'https://%{pm_company}.wealth-park.com/chat/api/check_alive',
   interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
+  custom_http_check: CHAT_CUSTOM_HTTP_CHECK,
 }}
 
 $chat_ws_prod = %{{
@@ -77,6 +80,7 @@ $potato_prod = %{{
   ],
   interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
+  custom_http_check: POTATO_CUSTOM_HTTP_CHECK,
 }}
 
 $storage_prod = %{{
@@ -85,6 +89,7 @@ $storage_prod = %{{
   url: 'https://%{pm_company}.wealth-park.com/storage/api/v1/check_alive',
   interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
+  custom_http_check: STORAGE_CUSTOM_HTTP_CHECK,
 }}
 
 
