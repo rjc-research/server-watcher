@@ -3,7 +3,7 @@ POTATO_CUSTOM_HTTP_CHECK = lambda {
   |response|
   # check status code
   status_code = response.net_http_res.code
-  if not status_code =~ /^(2|3)[0-9]{2}$/
+  if not status_code =~ /^(2|3)0[0-1]$/
     return "Invalid status_code: #{status_code}"
   end
 
