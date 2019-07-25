@@ -2,24 +2,26 @@
 POTATO_CUSTOM_HTTP_CHECK = lambda {
   |response|
   # check status code
-  status_code = response.net_http_res.code
+  status_code = response.status.to_s
   if not status_code =~ /^(2|3)[0][0-1]$/
     return "Invalid status_code: #{status_code}"
   end
 
   # check URL
+  url = "#{response.host}:#{response.port}#{response.path}"
   if not (
-    response.request.url == 'https://live.wealth-park.com' or
-    response.request.url =~ /^https:\/\/[a-z0-9\-]+\.wealth-park\.com\/login$/
+    url =~ /^live.wealth-park.com:443\/?$/ or
+    url =~ /^[a-z0-9\-]+\.wealth-park\.com:443\/login\/?$/
   )
-    return "Invalid URL: #{response.request.url}"
+    return "Invalid URL: #{url}"
   end
   
   # scan for specific texts
+  body = response.body.force_encoding('UTF-8')
   if not (
-    response.body.scan(/(サインイン|Sign In|登錄)/).count > 0 and
-    response.body.scan(/(メールアドレス|Email|電郵地址)/).count > 0 and
-    response.body.scan(/(パスワード|Password|密碼)/).count > 0
+    body.scan(/(サインイン|Sign In|登錄)/).count > 0 and
+    body.scan(/(メールアドレス|Email|電郵地址)/).count > 0 and
+    body.scan(/(パスワード|Password|密碼)/).count > 0
   )
     return "Can't detect all mandatory texts of login page"
   end
@@ -32,7 +34,7 @@ POTATO_CUSTOM_HTTP_CHECK = lambda {
 API_CUSTOM_HTTP_CHECK = lambda {
   |response|
   # check status code
-  status_code = response.net_http_res.code
+  status_code = response.status.to_s
   if not status_code =~ /^(2|3)[0][0-1]$/
     return "Invalid status_code: #{status_code}"
   end
@@ -50,7 +52,7 @@ API_CUSTOM_HTTP_CHECK = lambda {
 CHAT_CUSTOM_HTTP_CHECK = lambda {
   |response|
   # check status code
-  status_code = response.net_http_res.code
+  status_code = response.status.to_s
   if not status_code =~ /^(2|3)[0][0-1]$/
     return "Invalid status_code: #{status_code}"
   end
@@ -68,13 +70,13 @@ CHAT_CUSTOM_HTTP_CHECK = lambda {
 CHAT_ADMIN_CUSTOM_HTTP_CHECK = lambda {
   |response|
   # check status code
-  status_code = response.net_http_res.code
+  status_code = response.status.to_s
   if not status_code =~ /^(2|3)[0][0-1]$/
     return "Invalid status_code: #{status_code}"
   end
   
   # check body
-  if not response.body.scan('<script src="./app.min.js"></script>').count > 0
+  if not response.body.force_encoding('UTF-8').scan('<script src="./app.min.js"></script>').count > 0
     return "Body doesn't contain 'app.min.js'"
   end
 
@@ -86,7 +88,7 @@ CHAT_ADMIN_CUSTOM_HTTP_CHECK = lambda {
 STORAGE_CUSTOM_HTTP_CHECK = lambda {
   |response|
   # check status code
-  status_code = response.net_http_res.code
+  status_code = response.status.to_s
   if not status_code =~ /^(2|3)[0][0-1]$/
     return "Invalid status_code: #{status_code}"
   end

@@ -1,6 +1,6 @@
 require 'logger'
 require 'uri'
-require 'rest-client'
+require 'excon'
 require 'open-uri'
 require 'json'
 require 'mail'

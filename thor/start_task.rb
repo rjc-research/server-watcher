@@ -201,18 +201,38 @@ class StartTask
   def check_http(url, custom_http_check)
     begin
       @logger.info(" - GET #{url}")
-      response = RestClient.get(url)
-      # status code == 200
+      response = send_http_request(url)
       is_success = true
       err_msg = ''
-      if custom_http_check && (custom_http_check_result = custom_http_check.call(response))
-        is_success = false
-        err_msg = "`custom_http_check` method returns: #{custom_http_check_result}"
+      if custom_http_check
+        custom_http_check_result = custom_http_check.call(response)
+        if not custom_http_check_result.nil?
+          is_success = false
+          err_msg = "`custom_http_check` method returns: #{custom_http_check_result}"
+        end
+      else
+        if response.status != 200
+          is_success = false
+          err_msg = "Failed with status code: #{response.status}"
+        end
       end
       return [is_success, err_msg, []]
     rescue Exception => e
       # status code != 200
       return [false, e.message, e.backtrace]
+    end
+  end
+
+  def send_http_request(url)
+    response = Excon.get(url)
+    if response.status.to_s =~ /^3[0-9]{2}$/
+      redirect_to = response.headers['Location']
+      if redirect_to.start_with?('/')
+        redirect_to = "#{url}#{redirect_to}"
+      end
+      send_http_request(redirect_to)
+    else
+      response
     end
   end
 
