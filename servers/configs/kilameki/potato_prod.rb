@@ -1,8 +1,8 @@
 {
   active: true,
-  name: 'kirameki/potato/production',
+  name: 'kilameki/potato/production',
   url: [
-    'https://kirameki.wealth-park.com',
+    'https://kilameki.wealth-park.com',
   ],
   interval: INTERVAL,
   alert: ALERT_EMAIL_ADDRESSES,
