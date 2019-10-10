@@ -8,10 +8,10 @@ class NewPmTask
     # create watcher for services
     folder = "servers/configs/#{pm_company}"
     FileUtils.mkdir_p(folder)
-    new_file("#{folder}/api_prod.rb", $api_prod % { pm_company: pm_company })
-    new_file("#{folder}/chat_admin_prod.rb", $chat_admin_prod % { pm_company: pm_company })
-    new_file("#{folder}/chat_http_prod.rb", $chat_http_prod % { pm_company: pm_company })
-    new_file("#{folder}/chat_ws_prod.rb", $chat_ws_prod % { pm_company: pm_company })
+    # new_file("#{folder}/api_prod.rb", $api_prod % { pm_company: pm_company })
+    # new_file("#{folder}/chat_admin_prod.rb", $chat_admin_prod % { pm_company: pm_company })
+    # new_file("#{folder}/chat_http_prod.rb", $chat_http_prod % { pm_company: pm_company })
+    # new_file("#{folder}/chat_ws_prod.rb", $chat_ws_prod % { pm_company: pm_company })
     new_file("#{folder}/potato_prod.rb", $potato_prod % { pm_company: pm_company })
     new_file("#{folder}/storage_prod.rb", $storage_prod % { pm_company: pm_company })
     
@@ -19,11 +19,11 @@ class NewPmTask
     folder = "servers/configs/gateway/services/#{pm_company}"
     FileUtils.mkdir_p(folder)
     # new_file("#{folder}/api.rb", $gateway_api % { pm_company: pm_company })
-    (0..1).each {
-      |i|
-      port = "801#{i}"
-      new_file("#{folder}/chat-#{port}.rb", $gateway_chat % { pm_company: pm_company, port: port })
-    }
+    # (0..1).each {
+    #   |i|
+    #   port = "801#{i}"
+    #   new_file("#{folder}/chat-#{port}.rb", $gateway_chat % { pm_company: pm_company, port: port })
+    # }
     new_file("#{folder}/storage.rb", $gateway_storage % { pm_company: pm_company })
   end
 
