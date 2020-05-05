@@ -1,5 +1,5 @@
 {
-  active: true,
+  active: false,
   name: 'demo-wp28/storage/prod',
   url: 'https://demo-wp28.wealth-park.com/storage/api/v1/check_alive',
   interval: INTERVAL,

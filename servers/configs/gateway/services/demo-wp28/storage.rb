@@ -1,5 +1,5 @@
 {
-  active: true,
+  active: false,
   name: 'gateway/services/demo-wp28/storage',
   url: 'https://gateway.wealth-park.com/gateway/api/check_service_connecting/demo-wp28-storage',
   interval: INTERVAL,

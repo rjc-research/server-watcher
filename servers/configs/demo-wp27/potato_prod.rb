@@ -1,5 +1,5 @@
 {
-  active: true,
+  active: false,
   name: 'demo-wp27/potato/production',
   url: [
     'https://demo-wp27.wealth-park.com',
