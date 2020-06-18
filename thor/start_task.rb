@@ -1,3 +1,5 @@
+require 'slack-notifier'
+
 class StartTask
   include Utils
 
@@ -7,6 +9,8 @@ class StartTask
   def initialize(*args)
     super(*args)
     @logger = EMThreadSafeLogger.new("log/watcher.log", 'daily')
+    
+    @slack = Slack::Notifier.new SLACK_WEBHOOK
   end
 
   def do
@@ -183,6 +187,10 @@ class StartTask
         content,
         log_files
       )
+      send_slack(
+        "Server '#{name}' is DOWN",
+        content
+      )
       @logger.info('   DONE')
     end
 
@@ -285,6 +293,13 @@ class StartTask
       ServerWatcherMailer.notify_server_down(send_mail_config['from'], _to, _subject, _body, _logs)
                          .deliver_now
     end
+  end
+
+  def send_slack(_subject, _body)
+    attachment = {
+      text: _body
+    }
+    @slack.post _subject, attachments: [attachment]
   end
 
   def execute_remote(ssh, script)
