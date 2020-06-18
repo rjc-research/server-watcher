@@ -1,5 +1,5 @@
 # mail | actionmailer
-using_gem: actionmailer
+using_gem: mail
 from: noreply@server-watch.com
 
 # if `using_gem: actionmailer`
