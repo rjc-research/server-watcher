@@ -9,7 +9,7 @@ class StartTask
   def initialize(*args)
     super(*args)
     @logger = EMThreadSafeLogger.new("log/watcher.log", 'daily')
-    
+
     @slack = Slack::Notifier.new SLACK_WEBHOOK
   end
 
@@ -297,9 +297,10 @@ class StartTask
 
   def send_slack(_subject, _body)
     attachment = {
-      text: _body
+      text: _body,
+      color: "#ff3300",
     }
-    @slack.post _subject, attachments: [attachment]
+    @slack.post text: _subject, attachments: [attachment]
   end
 
   def execute_remote(ssh, script)
