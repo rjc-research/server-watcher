@@ -1,5 +1,5 @@
 {
-  active: true,
+  active: false,
   name: 'countly',
   url: 'https://countly.wealth-park.com',
   interval: INTERVAL,
